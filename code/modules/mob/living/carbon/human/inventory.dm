@@ -163,6 +163,10 @@
 			updatename = 1
 		head = null
 		I.unequipped(src, SLOT_HEAD)
+		if(istype(I, /obj/item/clothing/head/helmet/vision_mod))
+			var/obj/item/clothing/head/helmet/vision_mod/helm = I
+			if(helm.vision_flags || helm.darkness_view || helm.lighting_alpha)
+				update_sight()
 		if(updatename)
 			name = get_visible_name()
 		if(I.flags_inv_hide & (HIDEALLHAIR|HIDETOPHAIR|HIDELOWHAIR))

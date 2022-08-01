@@ -15,7 +15,9 @@ GLOBAL_LIST_INIT(huds, list(
 	DATA_HUD_SQUAD = new /datum/atom_hud/squad,
 	DATA_HUD_ORDER = new /datum/atom_hud/order,
 	DATA_HUD_AI_DETECT = new /datum/atom_hud/ai_detector,
-	DATA_HUD_MEDICAL_PAIN = new /datum/atom_hud/medical/pain
+	DATA_HUD_MEDICAL_PAIN = new /datum/atom_hud/medical/pain,
+	DATA_HUD_USSR_TEAM = new /datum/atom_hud/team/ussr,
+	DATA_HUD_NATSF_TEAM = new /datum/atom_hud/team/natsf
 	))
 
 

@@ -618,3 +618,179 @@
 	flags_item = NODROP|DELONDROP
 	soft_armor = list("melee" = 65, "bullet" = 60, "laser" = 30, "energy" = 20, "bomb" = 25, "bio" = 40, "rad" = 0, "fire" = 20, "acid" = 20)
 	anti_hug = 5
+
+/obj/item/clothing/head/helmet/vision_mod
+	active = TRUE
+	///Whether the helmet can be turned on or off
+	var/toggleable = FALSE
+	///Allows the wearer to see certain things through walls
+	var/vision_flags = 0
+	///Allows night vision
+	var/darkness_view = 2 //Base human is 2
+	///Used to remove darkness
+	var/lighting_alpha
+	///Affects how floor is colored
+	var/list/floor_color_mod = list(0.1,0.1,0.1,0, 0.3,0.3,0.3,0, 0.4,0.4,0.4,0, 0,0,0,1, -0.3,-0.3,-0.3,0)
+	///Affects how any other things are colored
+	var/list/game_color_mod = list(0.3,0.3,0.3,0, 0.59,0.59,0.59,0, 0.11,0.11,0.11,0, 0,0,0,3, -0.1,-0.1,-0.1,0)
+
+/obj/item/clothing/head/helmet/vision_mod/equipped(mob/user, slot)
+	. = ..()
+
+	if(slot != SLOT_HEAD || !active)
+		disable_vis_overlay(user)
+		return ..()
+
+	enable_vis_overlay(user)
+	..()
+
+/obj/item/clothing/head/helmet/vision_mod/dropped(mob/living/carbon/human/user)
+	if(istype(user))
+		if(src == user.head) //dropped is called before the inventory reference is updated.
+			disable_vis_overlay(user)
+	..() 
+
+/obj/item/clothing/head/helmet/vision_mod/attack_self(mob/user)
+	toggle_item_state(user)
+
+/obj/item/clothing/head/helmet/vision_mod/toggle_item_state(mob/user)
+	. = ..()
+	if(!toggleable)
+		return
+	if(active)
+		message_admins("deactivate helmet")
+		deactivate_helmet(user)
+	else
+		message_admins("activate helmet")
+		activate_helmet(user)
+
+	update_action_button_icons()
+
+///Activates visual modification
+/obj/item/clothing/head/helmet/vision_mod/proc/activate_helmet(mob/user, silent = FALSE)
+	active = TRUE
+	enable_vis_overlay(user)
+	if(!silent)
+		to_chat(user, "You activate the optical matrix on [src].")
+		playsound(user, 'sound/items/googles_on.ogg', 15)
+
+///Deactivates visual modification
+/obj/item/clothing/head/helmet/vision_mod/proc/deactivate_helmet(mob/user, silent = FALSE)
+	active = FALSE
+	disable_vis_overlay(user)
+	if(!silent)
+		to_chat(user, "You deactivate the optical matrix on [src].")
+		playsound(user, 'sound/items/googles_off.ogg', 15)
+
+
+///Enables any additional visual elements that might be shown on the player's screen
+/obj/item/clothing/head/helmet/vision_mod/proc/enable_vis_overlay(mob/user)
+	return
+
+///Disables any additional visual elements that might be shown on the player's screen
+/obj/item/clothing/head/helmet/vision_mod/proc/disable_vis_overlay(mob/user)
+	return
+
+/obj/item/clothing/head/helmet/vision_mod/thermals
+	name = "thermal helmet"
+	desc = "Specialized helmet able to see heat signatures. Has a built-in function to distinguish allies."
+	icon_state = "helmet"
+	item_state = "helmet"
+	toggleable = TRUE
+	actions_types = list(/datum/action/item_action/toggle)
+	darkness_view = 28
+	lighting_alpha = LIGHTING_PLANE_ALPHA_INVISIBLE
+	floor_color_mod = list(0.1,0.1,0.1,0, 0.3,0.3,0.3,0, 0.4,0.4,0.4,0, 0,0,0,1, -0.3,-0.3,-0.3,0)
+	game_color_mod = list(0.3,0.3,0.3,0, 0.59,0.59,0.59,0, 0.11,0.11,0.11,0, 0,0,0,3, -0.1,-0.1,-0.1,0)
+
+/obj/item/clothing/head/helmet/vision_mod/thermals/enable_vis_overlay(mob/living/carbon/human/user)
+	if(!istype(user))
+		return
+
+	var/hud_type = DATA_HUD_USSR_TEAM
+	if(istype(user.job, /datum/job/natsf))
+		hud_type = DATA_HUD_NATSF_TEAM
+	var/datum/atom_hud/H = GLOB.huds[hud_type]
+
+	var/obj/screen/plane_master/game_world/game_master = locate(/obj/screen/plane_master/game_world) in user.client?.screen
+	var/obj/screen/plane_master/floor/floor_master = locate(/obj/screen/plane_master/floor) in user.client?.screen
+
+	H.add_hud_to(user)
+	user.overlay_fullscreen("thermals_overlay", /obj/screen/fullscreen/thermals)	
+	if(user.client)
+		animate(game_master, color = game_color_mod, time = 10)
+		animate(floor_master, color = floor_color_mod, time = 10)
+
+	..()
+
+/obj/item/clothing/head/helmet/vision_mod/thermals/disable_vis_overlay(mob/living/carbon/human/user)
+	if(!istype(user))
+		return
+
+	var/hud_type = DATA_HUD_USSR_TEAM
+	if(istype(user.job, /datum/job/natsf))
+		hud_type = DATA_HUD_NATSF_TEAM
+	var/datum/atom_hud/H = GLOB.huds[hud_type]
+
+	var/obj/screen/plane_master/game_world/game_master = locate(/obj/screen/plane_master/game_world) in user.client?.screen
+	var/obj/screen/plane_master/floor/floor_master = locate(/obj/screen/plane_master/floor) in user.client?.screen
+
+	H.remove_hud_from(user)
+	user.clear_fullscreen("thermals_overlay")
+	if(user.client)
+		animate(game_master, color = list(), time = 10)
+		animate(floor_master, color = list(), time = 10)
+
+	..()
+
+/obj/item/clothing/head/helmet/vision_mod/nv_goggles
+	name = "night vision helmet"
+	desc = "Specialized helmet able to see in the dark. Has a built-in function to distinguish allies."
+	icon_state = "natcom_mob"
+	item_state = "natcom_mob"
+	toggleable = TRUE
+	actions_types = list(/datum/action/item_action/toggle)
+	darkness_view = 28
+	lighting_alpha = LIGHTING_PLANE_ALPHA_INVISIBLE
+	floor_color_mod = list(0,0.2,0,0, 0.2,0.2,0.2,0, 0,0.11,0,0, 0,0,0,3, -0.3,-0.3,-0.3,0)
+	game_color_mod = list(0.1,0.3,0.1,0, 0.4,0.2,0.4,0, 0.05,0.11,0.05,0, 0,0,0,6, -0.1,-0.1,-0.1,0)
+
+/obj/item/clothing/head/helmet/vision_mod/nv_goggles/enable_vis_overlay(mob/living/carbon/human/user)
+	if(!istype(user))
+		return
+
+	var/hud_type = DATA_HUD_USSR_TEAM
+	if(istype(user.job, /datum/job/natsf))
+		hud_type = DATA_HUD_NATSF_TEAM
+	var/datum/atom_hud/H = GLOB.huds[hud_type]
+
+	var/obj/screen/plane_master/game_world/game_master = locate(/obj/screen/plane_master/game_world) in user.client?.screen
+	var/obj/screen/plane_master/floor/floor_master = locate(/obj/screen/plane_master/floor) in user.client?.screen
+
+	H.add_hud_to(user)
+	user.overlay_fullscreen("night_vision_overlay", /obj/screen/fullscreen/night_vision)	
+	if(user.client)
+		animate(game_master, color = game_color_mod, time = 10)
+		animate(floor_master, color = floor_color_mod, time = 10)
+
+	..()
+
+/obj/item/clothing/head/helmet/vision_mod/nv_goggles/disable_vis_overlay(mob/living/carbon/human/user)
+	if(!istype(user))
+		return
+
+	var/hud_type = DATA_HUD_USSR_TEAM
+	if(istype(user.job, /datum/job/natsf))
+		hud_type = DATA_HUD_NATSF_TEAM
+	var/datum/atom_hud/H = GLOB.huds[hud_type]
+
+	var/obj/screen/plane_master/game_world/game_master = locate(/obj/screen/plane_master/game_world) in user.client?.screen
+	var/obj/screen/plane_master/floor/floor_master = locate(/obj/screen/plane_master/floor) in user.client?.screen
+
+	H.remove_hud_from(user)
+	user.clear_fullscreen("night_vision_overlay")
+	if(user.client)
+		animate(game_master, color = list(), time = 10)
+		animate(floor_master, color = list(), time = 10)
+
+	..()

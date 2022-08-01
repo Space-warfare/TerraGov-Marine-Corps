@@ -20,6 +20,8 @@
 #define AI_DETECT_HUD				"ai_detect_hud" //hud for displaying the AI eye's location
 #define PAIN_HUD					"pain_hud" //displays human pain / preceived health.
 #define ARMOR_SUNDER_HUD			"armor_sunder_hud" //displays how much sunder has been applied.
+#define USSR_TEAM_HUD				"ussr_team_hud" //used for effects such as the red/green overlays when using thermals goggles
+#define NATSF_TEAM_HUD				"natsf_team_hud" //used for effects such as the red/green overlays when using thermals goggles
 
 #define ADD_HUD_TO_COOLDOWN 20 //cooldown for being shown the images for any particular data hud
 
@@ -41,7 +43,8 @@
 #define DATA_HUD_ORDER					10
 #define DATA_HUD_AI_DETECT				11
 #define DATA_HUD_MEDICAL_PAIN			12
-
+#define DATA_HUD_USSR_TEAM				13
+#define DATA_HUD_NATSF_TEAM				14
 
 // Notification action types
 #define NOTIFY_JUMP "jump"

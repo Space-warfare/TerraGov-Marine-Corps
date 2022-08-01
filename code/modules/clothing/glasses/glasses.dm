@@ -17,7 +17,6 @@
 	var/invis_override = 0 //Override to allow glasses to set higher than normal see_invis
 	var/lighting_alpha
 
-
 /obj/item/clothing/glasses/update_clothing_icon()
 	if (ismob(src.loc))
 		var/mob/M = src.loc
@@ -25,6 +24,10 @@
 
 
 /obj/item/clothing/glasses/attack_self(mob/user)
+	toggle_item_state(user)
+
+/obj/item/clothing/glasses/toggle_item_state(mob/user)
+	. = ..()
 	if(toggleable)
 		toggle_glasses(user)
 
@@ -53,7 +56,6 @@
 	if(!silent)
 		to_chat(user, "You deactivate the optical matrix on [src].")
 		playsound(user, 'sound/items/googles_off.ogg', 15)
-
 
 /obj/item/clothing/glasses/science
 	name = "science goggles"
@@ -304,7 +306,6 @@
 			var/datum/atom_hud/H = GLOB.huds[hud_type]
 			H.remove_hud_from(user)
 	..()
-
 
 /obj/item/clothing/glasses/sunglasses/sechud/tactical
 	name = "tactical HUD"

@@ -66,6 +66,9 @@ GLOBAL_PROTECT(exp_specialmap)
 	if(!ishuman(L))
 		return
 
+	var/mob/living/carbon/human/hudman = L
+	hudman.setup_team_huds()
+
 	if(job_flags & JOB_FLAG_PROVIDES_BANK_ACCOUNT)
 		var/datum/money_account/bank_account = create_account(L.real_name, rand(50, 500) * 10)
 		var/list/remembered_info = list()

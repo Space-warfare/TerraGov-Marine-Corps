@@ -413,6 +413,14 @@
 			if(!isnull(G.lighting_alpha))
 				lighting_alpha = min(lighting_alpha, G.lighting_alpha)
 
+	if(istype(head, /obj/item/clothing/head/helmet/vision_mod))
+		var/obj/item/clothing/head/helmet/vision_mod/helm = head
+		if((helm.toggleable && helm.active) || !helm.toggleable)
+			sight |= helm.vision_flags
+			see_in_dark = max(helm.darkness_view, see_in_dark)
+			if(!isnull(helm.lighting_alpha))
+				lighting_alpha = min(lighting_alpha, helm.lighting_alpha)
+
 	if(see_override)
 		see_invisible = see_override
 

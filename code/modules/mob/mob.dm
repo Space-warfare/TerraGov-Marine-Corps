@@ -111,7 +111,10 @@
 /mob/proc/prepare_huds()
 	hud_list = new
 	for(var/hud in hud_possible) //Providing huds.
-		hud_list[hud] = image('icons/mob/hud.dmi', src, "")
+		var/image/hud_image = image('icons/mob/hud.dmi', src, "")
+		hud_image.plane = UNDER_HUD_LAYER
+		hud_image.layer = UNDER_HUD_LAYER
+		hud_list[hud] = hud_image
 
 
 /mob/proc/show_message(msg, type, alt_msg, alt_type)
